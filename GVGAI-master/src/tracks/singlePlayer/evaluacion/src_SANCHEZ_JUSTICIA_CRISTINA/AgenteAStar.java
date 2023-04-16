@@ -78,7 +78,6 @@ public class AgenteAStar extends Agente {
 		if (camino.size() == 0) {
 			long tInicio = System.nanoTime(); 
 			camino = AStar(stateObs, inicio, portal);
-			System.out.println(camino); 
 			long tFin = System.nanoTime(); 
 			// Para rellenar la tabla
 			System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000);

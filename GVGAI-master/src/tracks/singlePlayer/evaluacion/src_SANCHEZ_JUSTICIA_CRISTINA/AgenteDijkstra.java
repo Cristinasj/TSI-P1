@@ -76,8 +76,7 @@ public class AgenteDijkstra extends Agente {
 		// Si no hay camino calculado se calcula el camino 
 		if (camino.size() == 0) {
 			long tInicio = System.nanoTime(); 
-			camino = Dijkstra(stateObs, inicio, portal);
-			System.out.println(camino); 
+			camino = Dijkstra(stateObs, inicio, portal); 
 			long tFin = System.nanoTime(); 
 			// Para rellenar la tabla
 			System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000 + " s");

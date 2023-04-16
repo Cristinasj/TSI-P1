@@ -90,7 +90,6 @@ public class AgenteCompeticion extends Agente {
 		if (camino.size() == 0) {
 			long tInicio = System.nanoTime(); 
 			camino = Competicion(stateObs, inicio, portal);
-			System.out.println(camino); 
 			long tFin = System.nanoTime(); 
 			// Para rellenar la tabla
 			System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000);
@@ -100,8 +99,7 @@ public class AgenteCompeticion extends Agente {
 		}		
 		// Si ya tenemos el camino, se van sacando las posiciones 
 		if (camino.size() > 0) {
-			accion = camino.get(0); 
-			System.out.println(accion); 
+			accion = camino.get(0);  
 			camino.remove(0);
 			// Si la acción nos lleva a una trampa o a un muro
 			// se devuelve NIL y se recalcula
@@ -112,12 +110,8 @@ public class AgenteCompeticion extends Agente {
 			if(accion == ACTIONS.ACTION_DOWN) nuevaY++;
 			if(accion == ACTIONS.ACTION_LEFT) nuevaX--; 
 			if(accion == ACTIONS.ACTION_RIGHT) nuevaX++;  
-			System.out.println(nuevaX); 
-			System.out.println(nuevaY);
-			System.out.println(esVisitable.get(nuevaX).get(nuevaY)); 
 			esVisitable = llenarMatriz(stateObs); 
 			if (!esVisitable.get(nuevaX).get(nuevaY)) {
-				System.out.println("Aclarar"); 
 				camino.clear(); 
 				accion = ACTIONS.ACTION_NIL; 
 			}

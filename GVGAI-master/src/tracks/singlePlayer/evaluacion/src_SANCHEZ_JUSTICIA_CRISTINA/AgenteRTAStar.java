@@ -7,19 +7,21 @@ import core.game.StateObservation;
 import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 
+
 public class AgenteRTAStar extends Agente {
 	
 	ArrayList<ACTIONS> camino; 
 	int numLlamadasAct = 0; 
 	ArrayList<ArrayList<Boolean>> esVisitable;
 	boolean encontrado; // Salida de datos
-	HashMap<Integer, Integer> heuristicas;  
+	HManager heuristicas;  
 
 	public AgenteRTAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
 		super(stateObs, elapsedTimer);
 		camino = new ArrayList<ACTIONS>(); 
 		encontrado = false; 
-		heuristicas = new HashMap<>(); 
+		heuristicas = new HManager(); 
+		esVisitable = llenarMatriz(stateObs);
 	}
 	
 	/**
@@ -31,58 +33,86 @@ public class AgenteRTAStar extends Agente {
 	public ACTIONS RTAStar (StateObservation stateObs,
 			ArrayList<Integer> inicio, 
 			ArrayList<Integer> coordenadasFin) {
-		Nodo nodoActual = new Nodo(inicio.get(0), 
-				inicio.get(1), null, ACTIONS.ACTION_NIL);
-		Nodo fin = new Nodo(coordenadasFin.get(0), coordenadasFin.get(1), null, 
-				ACTIONS.ACTION_NIL);  
-		Nodo nodoSiguiente = null; 
-		ArrayList<Nodo> vecindario = nodoActual.generarSucesores(); 
-		ArrayList<ArrayList<Boolean>> esVisitable = llenarMatriz(stateObs);
-		int f, heuristicaActual; 
-		final int INF = 99999; 
-		int mejorH = INF; 
-		int mejorH2 = INF; 
-		
-		for (Nodo vecino : vecindario) {
-			if (esVisitable.get(nodoActual.x).get(nodoActual.y)) {
-				// Se ha visitado el nodo 
-				if (heuristicas.containsKey(vecino.getID()))
-					f = heuristicas.get(vecino.getID());
-				else {
-					vecino.g = 0; 
-					vecino.h = vecino.getDistancia(fin); 
-					f = vecino.f(); 
-					
-				}
-				if (f < mejorH) {
-					mejorH2 = mejorH;
-					mejorH = f; 
-					nodoSiguiente = vecino; 
-				}
-				else 
-					if (f < mejorH2)
-						mejorH2 = f; 
-					
-				
-			}
-		}
-		if (heuristicas.containsKey(nodoActual.getID()))
-			heuristicaActual = heuristicas.get(nodoActual.getID()); 
-		else 
-			heuristicaActual = nodoActual.f(); 
-		// Se busca el máximo 
-		if (mejorH2 != INF && mejorH2 > heuristicaActual)
-			heuristicaActual = mejorH2 + 1; 
-		else {
-			if (mejorH+1 > heuristicaActual) {
-				heuristicaActual = mejorH+1; 
-			}
-		}
-		heuristicas.put(nodoActual.getID(), heuristicaActual); 
-		nodosExpandidos++; 
-		if (nodoSiguiente.esIgualA(fin))
-			encontrado = true; 
-		return nodoSiguiente.ultimaAccion; 
+	    // Obtener nodo en el que se encuentra
+	    Nodo actual = new Nodo(inicio.get(0), inicio.get(1));
+	    Nodo fin = new Nodo(coordenadasFin.get(0), coordenadasFin.get(1)); 
+	    heuristicas.setNodoFinal(fin);
+	    
+	    // Generar los sucesores
+	    ArrayList<Nodo> sucesores = new ArrayList<Nodo>();
+	    ArrayList<Integer> hs = new ArrayList<Integer>();
+	    Nodo arriba = new Nodo(actual.x, actual.y-1);
+	    if (esVisitable.get(arriba.x).get(arriba.y)) {
+	      sucesores.add(arriba);
+	      hs.add(heuristicas.get(arriba.x, arriba.y));
+	    }
+	    Nodo abajo = new Nodo(actual.x, actual.y+1);
+	    if (esVisitable.get(abajo.x).get(abajo.y)) {
+	      sucesores.add(abajo); 
+	      hs.add(heuristicas.get(abajo.x, abajo.y));
+	    }
+	    Nodo izquierda = new Nodo(actual.x-1, actual.y);
+	    if (esVisitable.get(izquierda.x).get(izquierda.y)) {
+	      sucesores.add(izquierda);
+	      hs.add(heuristicas.get(izquierda.x, izquierda.y));
+	    }
+	    Nodo derecha = new Nodo(actual.x+1, actual.y);
+	    if (esVisitable.get(derecha.x).get(derecha.y)) {
+	      sucesores.add(derecha); 
+	      hs.add(heuristicas.get(derecha.x, derecha.y));
+	    }
+	    
+	    // Seleccionar el de menor valor h
+	    int indMejorVecino = -1; int hMejorVecino = 999999;
+	    for (int i=0; i<hs.size(); ++i) {
+	      if (hs.get(i) < hMejorVecino) {
+	        hMejorVecino = hs.get(i);
+	        indMejorVecino = i;
+	      }
+	    }
+	    
+	    if (indMejorVecino == -1) {
+	      System.out.println("Debug: Saliendo porque no quedan acciones.");
+	      return ACTIONS.ACTION_NIL;
+	    }
+	    Nodo siguienteNodo = sucesores.get(indMejorVecino);
+	    
+	    // Seleccionar el de segundo menor valor h
+	    sucesores.remove(indMejorVecino);
+	    hs.remove(indMejorVecino);
+
+	    int hSegundoMejorVecino = 999999;
+	    int indSegundoMejorVecino = -1;
+	    for (int i=0; i<hs.size(); i++) {
+	      if (hs.get(i) < hSegundoMejorVecino) {
+	        hSegundoMejorVecino = hs.get(i);
+	        indSegundoMejorVecino = i;
+	      }
+	    }
+	    if (indSegundoMejorVecino == -1) {
+	      hSegundoMejorVecino = hMejorVecino;
+	    }
+	    
+	    // Actualizar la h del nodo actual, con el valor del segundo mejor vecino
+	    heuristicas.put(actual.x, actual.y, Math.max(heuristicas.get(actual.x, actual.y), hSegundoMejorVecino)+1);
+	    
+	    if (siguienteNodo.esIgualA(fin)) 
+	    	encontrado = true; 
+	    // Devolver la acción que lleva del nodo actual al siguiente
+	    if (actual.x == siguienteNodo.x) {
+	      if (siguienteNodo.y == actual.y+1) 
+	        return ACTIONS.ACTION_DOWN;
+	      else if (siguienteNodo.y == actual.y-1) 
+	        return ACTIONS.ACTION_UP;
+	    }
+	    else if (actual.y == siguienteNodo.y) {
+	      if (siguienteNodo.x == actual.x-1) 
+	        return ACTIONS.ACTION_LEFT;
+	      else if (siguienteNodo.x == actual.x+1) 
+	        return ACTIONS.ACTION_RIGHT;
+	    }
+	    
+	    return ACTIONS.ACTION_NIL;
 	}
 	
 	@Override
@@ -98,7 +128,7 @@ public class AgenteRTAStar extends Agente {
 				System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000);
 				System.out.println("Tamaño ruta: " + numLlamadasAct);
 				System.out.println("Numero de nodos: " + numLlamadasAct);
-				System.out.println("Máximo nº nodos en memoria: " + heuristicas.size()); 			
+				System.out.println("Máximo nº nodos en memoria: " + heuristicas.tabla.size()); 			
 			}
 		return accion;
 	}

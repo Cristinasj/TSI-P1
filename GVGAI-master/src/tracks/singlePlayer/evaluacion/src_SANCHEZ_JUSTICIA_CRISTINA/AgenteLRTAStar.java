@@ -21,7 +21,6 @@ public class AgenteLRTAStar extends Agente {
 		camino = new ArrayList<ACTIONS>(); 
 		encontrado = false; 
 		heuristicas = new HManager(); 
-		esVisitable = llenarMatriz(stateObs);
 	}
 	
 	/**
@@ -35,6 +34,7 @@ public class AgenteLRTAStar extends Agente {
 			ArrayList<Integer> coordenadasFin) {
 	    // Obtener nodo en el que se encuentra
 	    Nodo actual = new Nodo(inicio.get(0), inicio.get(1));
+	    esVisitable = llenarMatriz(stateObs);
 	    Nodo fin = new Nodo(coordenadasFin.get(0), coordenadasFin.get(1)); 
 	    heuristicas.setNodoFinal(fin);
 	    
@@ -77,7 +77,10 @@ public class AgenteLRTAStar extends Agente {
 	    Nodo siguienteNodo = sucesores.get(indMejorVecino);
 	    
 	    
-	    // Actualizar la h del nodo actual, con el valor del segundo mejor vecino
+	    // MOMENTO CLAVE 
+	    // Esta es la parte en la que se diferencia con el algoritmo 
+	    //  RTA* porque actualiza el mejor vecino en lugar del 
+	    // segundo mejor vecino 
 	    heuristicas.set(actual.x, actual.y, Math.max(heuristicas.get(actual.x, actual.y), hMejorVecino)+1);
 	    
 	    if (siguienteNodo.esIgualA(fin)) 

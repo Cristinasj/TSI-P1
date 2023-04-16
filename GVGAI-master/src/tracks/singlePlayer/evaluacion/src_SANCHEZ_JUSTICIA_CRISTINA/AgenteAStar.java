@@ -42,6 +42,7 @@ public class AgenteAStar extends Agente {
 			Nodo actual = abiertos.poll(); 
 			// if actual == objetivo: 
 			if (actual.x == fin.x && actual.y == fin.y) {
+				maxNodos++; 
 				// return, ya se ha encontrado el camino 
 				return actual.getCamino(); 
 			}
@@ -56,6 +57,7 @@ public class AgenteAStar extends Agente {
 					&& sucesor.g > ( actual.g + actual.getDistancia(sucesor))) {
 					// g(sucesor) = g(actual) + 
 					// distancia(actual, sucesor) 
+					nodosExpandidos++; 
 					sucesor.g = actual.g + actual.getDistancia(sucesor); 
 					abiertos.add(sucesor);
 					sucesor.h = sucesor.getDistancia(fin); 

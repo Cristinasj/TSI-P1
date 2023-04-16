@@ -15,13 +15,13 @@ public class AgenteRTAStar extends Agente {
 	boolean encontrado; // Salida de datos
 	HManager heuristicas;  
 	final int INF = 999999; 
+	float runtimeAcumulado = 0; 
 
 	public AgenteRTAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
 		super(stateObs, elapsedTimer);
 		camino = new ArrayList<ACTIONS>(); 
 		encontrado = false; 
-		heuristicas = new HManager(); 
-		esVisitable = llenarMatriz(stateObs);
+		heuristicas = new HManager(); 	
 	}
 	
 	/**
@@ -34,6 +34,7 @@ public class AgenteRTAStar extends Agente {
 			ArrayList<Integer> inicio, 
 			ArrayList<Integer> coordenadasFin) {
 	    // Obtener nodo en el que se encuentra
+		esVisitable = llenarMatriz(stateObs);
 	    Nodo actual = new Nodo(inicio.get(0), inicio.get(1));
 	    Nodo fin = new Nodo(coordenadasFin.get(0), coordenadasFin.get(1)); 
 	    heuristicas.setNodoFinal(fin);
@@ -122,9 +123,10 @@ public class AgenteRTAStar extends Agente {
 			long tInicio = System.nanoTime(); 
 			accion = RTAStar(stateObs, inicio, portal); 
 			long tFin = System.nanoTime(); 
+			runtimeAcumulado += (tFin - tInicio)/(float)1000000; 
 			// Para rellenar la tabla
 			if (encontrado) {
-				System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000);
+				System.out.println("Runtime acumulado: " + runtimeAcumulado);
 				System.out.println("Tamaño ruta: " + numLlamadasAct);
 				System.out.println("Numero de nodos: " + numLlamadasAct);
 				System.out.println("Máximo nº nodos en memoria: " + heuristicas.tabla.size()); 			

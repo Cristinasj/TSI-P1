@@ -42,6 +42,7 @@ public class AgenteDijkstra extends Agente {
 			Nodo actual = abiertos.poll(); 
 			// if actual == objetivo: 
 			if (actual.x == fin.x && actual.y == fin.y) {
+				maxNodos++; 
 				// return, ya se ha encontrado el camino 
 				return actual.getCamino(); 
 			}
@@ -54,6 +55,7 @@ public class AgenteDijkstra extends Agente {
 				// + distance(actual, sucesor):
 				if (esVisitable.get(sucesor.x).get(sucesor.y) 
 					&& sucesor.g > ( actual.g + actual.getDistancia(sucesor))) {
+					nodosExpandidos++; 
 					// g(sucesor) = g(actual) + 
 					// distancia(actual, sucesor) 
 					sucesor.g = actual.g + actual.getDistancia(sucesor); 
@@ -78,7 +80,7 @@ public class AgenteDijkstra extends Agente {
 			System.out.println(camino); 
 			long tFin = System.nanoTime(); 
 			// Para rellenar la tabla
-			System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000);
+			System.out.println("Runtime acumulado: " + (tFin - tInicio)/1000000 + " s");
 			System.out.println("Tamaño ruta: " + camino.size());
 			System.out.println("Numero de nodos: " + nodosExpandidos);
 			System.out.println("Máximo nº nodos en memoria: " + maxNodos); 	

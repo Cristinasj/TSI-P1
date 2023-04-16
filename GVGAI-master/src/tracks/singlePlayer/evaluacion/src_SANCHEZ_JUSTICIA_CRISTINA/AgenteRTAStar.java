@@ -7,7 +7,6 @@ import core.game.StateObservation;
 import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 
-
 public class AgenteRTAStar extends Agente {
 	
 	ArrayList<ACTIONS> camino; 
@@ -15,6 +14,7 @@ public class AgenteRTAStar extends Agente {
 	ArrayList<ArrayList<Boolean>> esVisitable;
 	boolean encontrado; // Salida de datos
 	HManager heuristicas;  
+	final int INF = 999999; 
 
 	public AgenteRTAStar(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
 		super(stateObs, elapsedTimer);
@@ -63,7 +63,7 @@ public class AgenteRTAStar extends Agente {
 	    }
 	    
 	    // Seleccionar el de menor valor h
-	    int indMejorVecino = -1; int hMejorVecino = 999999;
+	    int indMejorVecino = -1; int hMejorVecino = INF;
 	    for (int i=0; i<hs.size(); ++i) {
 	      if (hs.get(i) < hMejorVecino) {
 	        hMejorVecino = hs.get(i);
@@ -72,7 +72,6 @@ public class AgenteRTAStar extends Agente {
 	    }
 	    
 	    if (indMejorVecino == -1) {
-	      System.out.println("Debug: Saliendo porque no quedan acciones.");
 	      return ACTIONS.ACTION_NIL;
 	    }
 	    Nodo siguienteNodo = sucesores.get(indMejorVecino);
@@ -81,7 +80,7 @@ public class AgenteRTAStar extends Agente {
 	    sucesores.remove(indMejorVecino);
 	    hs.remove(indMejorVecino);
 
-	    int hSegundoMejorVecino = 999999;
+	    int hSegundoMejorVecino = INF;
 	    int indSegundoMejorVecino = -1;
 	    for (int i=0; i<hs.size(); i++) {
 	      if (hs.get(i) < hSegundoMejorVecino) {
@@ -94,7 +93,7 @@ public class AgenteRTAStar extends Agente {
 	    }
 	    
 	    // Actualizar la h del nodo actual, con el valor del segundo mejor vecino
-	    heuristicas.put(actual.x, actual.y, Math.max(heuristicas.get(actual.x, actual.y), hSegundoMejorVecino)+1);
+	    heuristicas.set(actual.x, actual.y, Math.max(heuristicas.get(actual.x, actual.y), hSegundoMejorVecino)+1);
 	    
 	    if (siguienteNodo.esIgualA(fin)) 
 	    	encontrado = true; 

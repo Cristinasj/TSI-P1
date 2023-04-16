@@ -9,9 +9,6 @@ import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
-
-
-
 public class Agente extends AbstractPlayer {
 	// Factor de escala entre mundos ( pixeles -> grid ) 
 	Vector2d fescala;

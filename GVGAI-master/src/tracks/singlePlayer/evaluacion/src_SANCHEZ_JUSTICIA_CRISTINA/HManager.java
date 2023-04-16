@@ -25,7 +25,7 @@ public class HManager {
 	      return val;
 	}
 	
-    public void put(int x, int y,int h) {
+    public void set(int x, int y,int h) {
         tabla.put(new Nodo(x,y).getID(), h);
       }
       
